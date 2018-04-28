@@ -12,8 +12,8 @@ angular.module('app', [])
 
     self.getMovies = function(){
       $http.get(apiUrl).then(function(res){
-        console.log(res)
-        self.movies = res.data;
+        console.log(res.data);
+        self.movies = res.data.data;
       })
     }
 

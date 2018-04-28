@@ -11,6 +11,7 @@ class TestCase(unittest.TestCase):
 
     def tearDown(self):
         self.db.drop_table()
+        self.db.create_table()
         self.db.close_conn()
 
     def test_create_movie(self):

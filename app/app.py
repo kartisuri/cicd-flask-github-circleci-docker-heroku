@@ -14,10 +14,10 @@ def get_movies():
 	try:
 		if flask.request.method == 'POST':
 			db.insert_movie(request.json['name'], request.json['cover'])
-			return jsonify(request.json), 201
+			return jsonify(data=request.json), 201
 		else:
 			movies = db.fetch_movies()
-			return jsonify(movies), 200
+			return jsonify(data=movies), 200
 	except Exception as e:
 		return jsonify(status='ERROR', message=str(e)), 500
 
