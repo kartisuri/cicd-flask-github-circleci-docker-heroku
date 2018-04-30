@@ -1,9 +1,10 @@
 import re
+import sys
 import os
-import threading
 import time
 import unittest
 import logging
+import subprocess
 from selenium import webdriver
 
 from app import app
@@ -16,7 +17,6 @@ class TestCase(unittest.TestCase):
         self.app = app.test_client()
         self.db = Database()
         self.db.create_table()
-        
 
     def tearDown(self):
         self.db.drop_table()
@@ -48,12 +48,10 @@ class TestCase(unittest.TestCase):
         assert result == movies
 
     def test_selenium(self):
-        threading.Thread(target=app.run).start()
-        time.sleep(3)
-        options = webdriver.ChromeOptions()
-        options.add_experimental_option("detach", True)
-        options.add_argument('headless')
+        p = subprocess.Popen(['python', '.\\app\\app.py'], stdout=subprocess.PIPE)
         try:
+            options = webdriver.ChromeOptions()
+            options.add_argument('headless')
             self.client = webdriver.Chrome(chrome_options=options,
                 service_args=["--verbose", "--log-path=test-reports/chrome.log"])
         except Exception as e:
@@ -61,16 +59,19 @@ class TestCase(unittest.TestCase):
             self.skipTest('Web browser not available')
         # navigate to index page
         self.client.get('http://localhost:5000/')
+        time.sleep(2)
         self.assertTrue(re.search('Hello,\s+Stranger!', self.client.page_source))
-
         self.client.find_element_by_name('name').send_keys('Avengers')
         self.client.find_element_by_name('cover').send_keys('https://image.tmdb.org/t/p/w1280/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg')
-        self.client.find_element_by_id('create').click()
+        button = self.client.find_element_by_id('create')
+        button.click()
         time.sleep(1)
-        print(self.client.page_source)
-        self.assertTrue(r'<h4 class="card-title" ng-binding>Avengers</h4>' in self.client.page_source)
-        self.assertTrue(r'src="https://image.tmdb.org/t/p/w1280/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg"' in self.client.page_source)
+        page_source = self.client.page_source
+        self.assertTrue(r'<h4 class="card-title ng-binding">Avengers</h4>' in page_source)
+        self.assertTrue(r'src="https://image.tmdb.org/t/p/w1280/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg"' in page_source)
+        self.client.get('http://localhost:5000/shutdown')
         self.client.quit()
+        p.kill()
 
 if __name__ == "__main__":
     unittest.main()

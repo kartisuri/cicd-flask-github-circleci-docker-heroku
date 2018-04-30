@@ -25,8 +25,19 @@ def get_movies():
 def index():
 	return render_template('index.html')
 
+@app.route('/shutdown', methods=['GET'])
+def shutdown():
+    stop_server()
+    return 'Server shutting down...'
+
 def start_server():
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
+
+def stop_server():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
 
 if __name__ == "__main__":
 	start_server()
