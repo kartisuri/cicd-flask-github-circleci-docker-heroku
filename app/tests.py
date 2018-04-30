@@ -48,7 +48,10 @@ class TestCase(unittest.TestCase):
         assert result == movies
 
     def test_selenium(self):
-        p = subprocess.Popen(['python', 'app\/app.py'], stdout=subprocess.PIPE)
+        realPath = os.path.realpath(__file__)
+        dirPath = os.path.dirname(realPath)
+        path = dirPath + 'app\/app.py'
+        p = subprocess.Popen(['python', path], stdout=subprocess.PIPE)
         try:
             options = webdriver.ChromeOptions()
             options.add_argument('headless')
