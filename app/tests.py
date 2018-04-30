@@ -50,7 +50,7 @@ class TestCase(unittest.TestCase):
     def test_selenium(self):
         realPath = os.path.realpath(__file__)
         dirPath = os.path.dirname(realPath)
-        path = dirPath + 'app\/app.py'
+        path = dirPath + '/app.py'
         p = subprocess.Popen(['python', path], stdout=subprocess.PIPE)
         try:
             options = webdriver.ChromeOptions()
