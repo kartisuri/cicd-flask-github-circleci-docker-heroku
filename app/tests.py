@@ -48,9 +48,7 @@ class TestCase(unittest.TestCase):
         assert result == movies
 
     def test_selenium(self):
-        realPath = os.path.realpath(__file__)
-        dirPath = os.path.dirname(realPath)
-        path = dirPath + '/app.py'
+        path = os.path.dirname(os.path.realpath(__file__)) + '/app.py'
         p = subprocess.Popen(['python', path], stdout=subprocess.PIPE)
         try:
             options = webdriver.ChromeOptions()
@@ -63,10 +61,15 @@ class TestCase(unittest.TestCase):
         # navigate to index page
         self.client.get('http://localhost:5000/')
         time.sleep(2)
-        self.assertTrue(re.search('Hello,\s+Stranger!', self.client.page_source))
+        # get hello stranger text from the div element by xpath and css class name
+        div_element = self.client.find_element_by_xpath('//div[@class="col-md-12"]').text
+        self.assertTrue('Hello, Stranger!', div_element)
+        # get name text box by name and type the given text
         self.client.find_element_by_name('name').send_keys('Avengers')
-        self.client.find_element_by_name('cover').send_keys('https://image.tmdb.org/t/p/w1280/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg')
-        button = self.client.find_element_by_id('create')
+        # get cover text box by id and type the given the text
+        self.client.find_element_by_id('cover').send_keys('https://image.tmdb.org/t/p/w1280/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg')
+        # get button element by css selector class and click
+        button = self.client.find_element_by_css_selector('.btn-success')
         button.click()
         time.sleep(1)
         page_source = self.client.page_source
